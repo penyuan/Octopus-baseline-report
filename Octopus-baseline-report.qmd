@@ -6,6 +6,8 @@ author:
     - "Jackie Thompson"
 format: html
 editor: visual
+title-block-banner: "#1f242d"
+title-block-banner-color: "#ffffff"
 ---
 
 ## Quarto
@@ -28,3 +30,121 @@ You can add options to executable code like this
 ```
 
 The `echo: false` option disables the printing of code (only output is displayed).
+
+## Executive Summary
+
+* About 150-200 words (???) abstract for this report.
+
+## Introduction
+
+* Octopus is a new research publishing platform.
+* It allows publishing outputs from across the research lifecycle through eight publication types.
+* To better understand how Octopus could achieve these aims and how it can engender systematic change, we are conducting this study on research culture with regards to the sharing of research outputs.
+* This can also help us understand the possible impacts of Octopus.
+* To do so, we conducted a (1) literature review; (2) semi-structured interviews of researchers across disciplines; and (3) a survey.
+* This report will end with a list and discussion of specific lessons learned from this study.
+
+## Positionality statements
+
+* Pen
+* Mariia
+* Jackie
+
+## Literature review
+
+[Mariia goes here]
+
+* Methods
+* Results
+
+## Interviews
+
+### methods
+
+* This was a qualitative study, where we conducted a series of semi-structured interviews with researchers in various disciplines.
+* Participant recruitment was done through our global professional network, and we aimed to interview researchers across
+  * Career stages
+  * Academic and non-academic contexts, including industry
+  * Locations, including outside of the Global North
+  * Natural and social science disciplines
+  * Gender (though not explicitly tracked)
+* We individually scheduled online calls with the researchers for interviews for approximately 60 minutes
+  * Interviews were recorded for audio, and recordings were deleted once the transcripts were completed and anonymised. We don't link these transcripts back to the individuals.
+* Interview design
+  * The topics were on the overall research culture in an interviewees research discipline, with questions focusing on
+    * Division of labour
+    * Credit
+    * Critique
+    * Assessment
+    * Attitude towards open research practices, including barriers
+    * Sharing/publishing practices
+  * Interview structure
+    * [include a copy of the interview guide here]
+  * Interviewees are offered a small voucher/donation after completion
+* The anonymised interview transcripts were qualitatively analysed by coding them for a thematic analyses.
+
+### results
+
+* Reached saturation with 14 interviews
+* Summary description of who the 14 people are
+  * Locations
+  * Disciplines
+  * Organisations they work for
+  * ...
+* Results of thematic analyses
+  * Include codebook
+  * Maybe some basic descriptive stats on most common themes, etc. [double check prior art on how this is reported]
+* Description of major themes with examples and/or quotes
+  * This will be the bulk of the interview section
+  * This will look like the updates I've provided so far on the interviews, such as the common sentiment valuing early feedback on research
+  * Select notable quotes from the interviews to support each point
+
+## Survey
+
+### methods
+
+* Based on learnings from the literature review and interivews, we selected a number of topics to cover for this survey: 
+  * Causes of publication bias
+  * Barriers to sharing research earlier and faster (despited interviewees's desire for it)
+  * How specialised people are in their fields
+  * Causes of publication bias
+  * Focus of research assessments
+  * Awareness of open research publishing platforms
+* While some topics (e.g. barriers to doing open research) have been identified or discussed in existing literature, the degree to which they are an issue or their variability across disciplines might be lacking
+* Survey design
+  * We internally iterated the survey structure and questions to manage the trade-off between complexity, length of time to complete, and granularity of the data. For example, 
+  * Tested to take a respondent about x minutes to complete
+  * Include a copy of the survey
+  * Participant information sheet
+  * Open-ended responses (when they choose "Other") are allowed for a few questions and will be analysed as such
+  * No personal information is collected unless the explicitly opt in to (1) being acknowledged by name; and/or (2) enter prize drawing
+* We leveraged our professional networks to find communities representing different disciplines, such as professional associations
+* We then disseminated the survey
+
+### results
+
+* Basic summary statistics on responses, e.g.: 
+  * Number of responses
+  * Where
+  * Which disciplines are represented
+  * What the answers "look like"
+* Analyses and results of open-ended responses (if any)
+* Discussion on themes emerging from the responses
+
+## Conclusion
+
+* Key take homes messages ("TLDR")
+  * Short bullet points
+* Short descriptive summary of learnings across literature review, interviews, and survey
+* What does this mean for Octopus?
+  * Which issues could Octopus tackle?
+  * How might researchers respond to Octopus? Factors affecting its use.
+  * What might Octopus not be able to affect?
+  * Suggestions for Octopus
+
+## Acknowledgements
+
+* Interviewees and survey respondents who chose to be acknowledged by name
+* UKRI/Research England, JISC, Alex et al.
+* Interview and survey testers
+* Anyone/anything else?
