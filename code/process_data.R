@@ -49,6 +49,8 @@ survey_data <- rowid_to_column(survey_data, "Response_ID")
 # Remove test responses
 survey_data <- survey_data %>%
     slice_head(n = -5) # The first 5 test responses are at the end of the data frame
+# Remove raw data from environment
+remove(survey_xls)
 
 # ------------------------------------------------------------------------------
 # Separate open-ended free text answers
@@ -78,7 +80,8 @@ career_lengths <- c("Less than 1 year",
 survey_data$"Career_length" <- fct(survey_data$"Career_length",
                                    levels = career_lengths)
 remove(career_lengths)
-# Create new grouping variable with cut-off at 5-years
+# Create new grouping variable with cut-off at 5-years, see:
+# https://stackoverflow.com/a/49849456/186904
 survey_data <- survey_data %>%
     mutate(`career_stage` = if_else(`Career_length` %in% c("Less than 1 year", "1 to 3 years", "3 to 5 years"),
                                     "less than 5 years",
