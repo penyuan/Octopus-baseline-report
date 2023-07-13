@@ -3,14 +3,29 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Load packages
+library(Cairo)
 library(dplyr)
 library(forcats)
 library(ggplot2)
 library(readr)
 library(readxl)
+library(showtext) # Better font support: https://github.com/yixuan/showtext
 library(stringr)
 library(tibble)
 library(tidyr)
+
+# Set up fonts
+#Cairo()
+font_add(family = "libsans", "LiberationSans-Regular.ttf")
+font_add(family = "dejavuxl", "DejaVuSans-ExtraLight.ttf")
+font_add(family = "nationalpark", "NationalPark-Regular.otf")
+showtext_auto()
+# Tweak default font settings for all plots, see:
+# https://www.statology.org/ggplot-font-size/
+# https://statisticsglobe.com/change-font-size-of-ggplot2-plot-in-r-axis-text-main-title-legend
+base_plot <- theme(text = element_text(family = "nationalpark",
+                                       size=16))
+#base_plot <- NULL
 
 #
 # Read data---------------------------------------------------------------------
@@ -132,18 +147,34 @@ remove(Assessment_order)
 # Subset the data
 research_fields <- survey_data %>%
     select("Response_ID", "Field")
+
 # Order the factors (i.e. fields) by number of responses followed by "Other"
 research_fields <- research_fields %>%
     mutate(across(contains("Field"), fct_infreq)) %>%
     mutate(across(contains("Field"), fct_rev)) %>%
     mutate(across(contains("Field"),
                   function(x) fct_relevel(x, "Other", after = 0L)))
+# Rename GLAM
+research_fields$Field <- fct_recode(research_fields$Field, "GLAM" = "Galleries, libraries, archives, and museums (GLAM)")
+
 # Create plot
 research_fields_fig <- ggplot(data = research_fields) +
     geom_bar(mapping = aes(y = `Field`), fill = "#fc8d59") +
     labs(x = "Number of responses", y = NULL) +
-    theme_classic()
+    theme_classic() +
+    base_plot
 research_fields_fig
+
+ggsave(
+    filename = "research_fields.png",
+    plot = research_fields_fig,
+    path = "plots/",
+    width = 720,
+    height = 480,
+    units = "px",
+    dpi = 72,
+    type = "cairo"
+)
 
 #
 # Career length-----------------------------------------------------------------
@@ -158,8 +189,20 @@ career_length <- survey_data %>%
 career_length_fig <- ggplot(data = career_length) +
     geom_bar(mapping = aes(y = `Career_length`), fill = "#fc8d59") +
     labs(x = "Number of responses", y = NULL) +
-    theme_classic()
+    theme_classic() +
+    base_plot
 career_length_fig
+
+ggsave(
+    filename = "career_length.png",
+    plot = career_length_fig,
+    path = "plots/",
+    width = 720,
+    height = 360,
+    units = "px",
+    dpi = 72,
+    type = "cairo"
+)
 
 #
 # Location----------------------------------------------------------------------
@@ -173,8 +216,20 @@ location <- survey_data %>%
 location_fig <- ggplot(data = location) +
     geom_bar(mapping = aes(y = `Location`), fill = "#fc8d59") +
     labs(x = "Number of responses", y = NULL) +
-    theme_classic()
+    theme_classic() +
+    base_plot
 location_fig
+
+ggsave(
+    filename = "location.png",
+    plot = location_fig,
+    path = "plots/",
+    width = 720,
+    height = 360,
+    units = "px",
+    dpi = 72,
+    type = "cairo"
+)
 
 #
 # Research culture--------------------------------------------------------------
@@ -228,14 +283,26 @@ research_culture_fig <- research_culture %>%
     summarise(prop = n()) %>% # I.e. number of responses for each level
     ggplot(aes(x = `prop`, y = `Factor`, fill = `Level`)) +
     geom_col(position = "fill") +
-    labs(x = "Proportion of responses", y = NULL) +
+    labs(x = "Percent of responses", y = NULL) +
     theme_classic() +
     scale_x_continuous(breaks = c(0, 0.5, 1.0), labels = scales::percent) +
     scale_fill_brewer(palette = "OrRd") +
     # https://stackoverflow.com/q/27130610/186904
     theme(legend.position = "bottom") +
-    guides(fill = guide_legend(title = NULL, nrow = 1, byrow = TRUE))
+    guides(fill = guide_legend(title = NULL, nrow = 1, byrow = TRUE)) +
+    base_plot
 research_culture_fig
+
+ggsave(
+    filename = "research_culture.png",
+    plot = research_culture_fig,
+    path = "plots/",
+    width = 720,
+    height = 480,
+    units = "px",
+    dpi = 72,
+    type = "cairo"
+)
 
 #
 # Barriers to not publishing----------------------------------------------------
@@ -286,11 +353,23 @@ not_publish_fig <- not_publish %>%
         x = `n_responses`/n_distinct(not_publish$"Response_ID"),
         y = `barriers`)) +
     geom_col(fill = "#fc8d59") +
-    labs(x = "Proportion of responses", y = NULL) +
+    labs(x = "Percent of responses", y = NULL) +
     theme_classic() +
     scale_x_continuous(labels = scales::percent) +
-    scale_fill_brewer(palette = "OrRd")
+    scale_fill_brewer(palette = "OrRd") +
+    base_plot
 not_publish_fig
+
+ggsave(
+    filename = "not_publish.png",
+    plot = not_publish_fig,
+    path = "plots/",
+    width = 720,
+    height = 480,
+    units = "px",
+    dpi = 72,
+    type = "cairo"
+)
 
 #
 # Barriers to publishing early--------------------------------------------------
@@ -338,11 +417,57 @@ publish_early_fig <- publish_early %>%
         x = `n_responses`/n_distinct(publish_early$Response_ID),
         y = `barriers`)) +
     geom_col(fill = "#fc8d59") +
-    labs(x = "Proportion of responses", y = NULL) +
+    labs(x = "Percent of responses", y = NULL) +
     theme_classic() +
     scale_x_continuous(labels = scales::percent) +
-    scale_fill_brewer(palette = "OrRd")
+    scale_fill_brewer(palette = "OrRd") +
+    base_plot
 publish_early_fig
+
+ggsave(
+    filename = "publish_early.png",
+    plot = publish_early_fig,
+    path = "plots/",
+    width = 720,
+    height = 480,
+    units = "px",
+    dpi = 72,
+    type = "cairo"
+)
+
+#
+# Relationship between barriers to publishing early ----------------------------
+#
+
+# See:
+# https://stackoverflow.com/a/75571396/186904
+
+publish_early_associations <- publish_early %>%
+    full_join(publish_early, by = "Response_ID", multiple = "all", suffix = c(".pre", ".post")) %>%
+    count(`barriers.pre`, `barriers.post`) %>%
+    mutate(proportion = n/max(n), .by = `barriers.pre`)
+
+publish_early_associations_plot <- publish_early_associations %>%
+    mutate(proportion = replace(proportion, barriers.pre == barriers.post, NA)) %>%
+    ggplot(aes(barriers.post, barriers.pre, fill = proportion)) +
+    geom_tile() +
+    geom_text(aes(label = scales::label_percent(accuracy = 1)(proportion))) +
+    scale_fill_distiller(palette = 8, direction = 1) +
+    # https://www.datanovia.com/en/blog/ggplot-axis-ticks-set-and-rotate-text-labels/
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          axis.title = element_blank()) +
+    scale_y_discrete(limits = rev)
+
+ggsave(
+    filename = "publish_early_associations.png",
+    plot = publish_early_associations_plot,
+    path = "plots/",
+    width = 720,
+    height = 720,
+    units = "px",
+    dpi = 72,
+    type = "cairo"
+)
 
 #
 # Division of labour------------------------------------------------------------
@@ -370,7 +495,7 @@ rm(Task_order)
 # http://www.cookbook-r.com/Manipulating_data/Renaming_levels_of_a_factor/
 levels(division_of_labour$"Task") <-
     list("Defining question" = "Tasks_definition",
-         "Reviewing state of the art" = "Tasks_review",
+         "Literature review" = "Tasks_review",
          "Defining hypothesis" = "Tasks_hypothesis",
          "Developing methodology" = "Tasks_methodology",
          "Data collection (qualitative)" = "Tasks_data_qualitative",
@@ -388,28 +513,46 @@ division_of_labour$"Task" <- as.character(division_of_labour$"Task")
 
 # Order the eventual display of tasks by the proportion of "do it mostly on my
 # own"
-prop_order <- division_of_labour %>%
-    filter(`Who` == "do it mostly as a team") %>%
-    group_by(`Task`, `Who`) %>%
-    # Get number of responses (`votes`) for "do it mostly on my own" for each
-    # factor.
-    summarise(votes = n()) %>%
-    arrange(votes) %>%
-    # Keep just the `Task` variable as a list of factors, which is now ordered
-    # by "do it mostly on my own" and can be used to order them in a
-    # visualisation.
-    pull(`Task`)
+# prop_order <- division_of_labour %>%
+#     filter(`Who` == "do it mostly as a team") %>%
+#     group_by(`Task`, `Who`) %>%
+#     # Get number of responses (`votes`) for "do it mostly on my own" for each
+#     # factor.
+#     summarise(votes = n()) %>%
+#     arrange(votes) %>%
+#     # Keep just the `Task` variable as a list of factors, which is now ordered
+#     # by "do it mostly on my own" and can be used to order them in a
+#     # visualisation.
+#     pull(`Task`)
 # Relevel the `Task`s by this new ordering.
-division_of_labour$"Task" <- fct_relevel(division_of_labour$"Task", prop_order)
-rm(prop_order)
+# division_of_labour$"Task" <- fct_relevel(division_of_labour$"Task", prop_order)
+# rm(prop_order)
+
+# Or, order by chronological order
+division_of_labour$Task <- fct_relevel(division_of_labour$Task,
+                                         "Defining question",
+                                         "Literature review",
+                                         "Defining hypothesis",
+                                         "Developing methodology",
+                                         "Data collection (qualitative)",
+                                         "Data collection (quantitative)",
+                                         "Curating and cleaning data",
+                                         "Analysing results",
+                                         "Interpreting the analysis",
+                                         "Applying to different context"
+                                         )
+# Then reverse it for plot:
+# https://forcats.tidyverse.org/reference/fct_rev.html
+division_of_labour$Task <- fct_rev(division_of_labour$Task)
 
 # Create 100% stacked bar plot
 division_of_labour_fig <- division_of_labour %>%
     group_by(`Task`, `Who`) %>%
     summarise(prop = n()) %>% # I.e. number of responses for each task
+    ungroup() %>%
     ggplot(aes(x = `prop`, y = `Task`, fill = `Who`)) +
     geom_col(position = "fill") +
-    labs(x = "Proportion of responses", y = NULL) +
+    labs(x = "Percent of responses", y = NULL) +
     theme_classic() +
     scale_x_continuous(breaks = c(0, 0.5, 1.0), labels = scales::percent) +
     scale_fill_brewer(palette = "OrRd") +
@@ -417,8 +560,20 @@ division_of_labour_fig <- division_of_labour %>%
     # https://stackoverflow.com/q/27130610/186904
     # http://www.cookbook-r.com/Graphs/Legends_(ggplot2)/
     theme(legend.position = "bottom") +
-    guides(fill = guide_legend(title = NULL, nrow = 2, byrow = TRUE))
+    guides(fill = guide_legend(title = NULL, nrow = 2, byrow = TRUE)) +
+    base_plot
 division_of_labour_fig
+
+ggsave(
+    filename = "division_of_labour.png",
+    plot = division_of_labour_fig,
+    path = "plots/",
+    width = 720,
+    height = 640,
+    units = "px",
+    dpi = 72,
+    type = "cairo"
+)
 
 #
 # Research assessment-----------------------------------------------------------
@@ -475,7 +630,7 @@ assessment_fig <- assessment %>%
     summarise(prop = n()) %>% # I.e. number of responses for each task
     ggplot(aes(x = `prop`, y = `Factor`, fill = `Influence`)) +
     geom_col(position = "fill") +
-    labs(x = "Proportion of responses", y = NULL) +
+    labs(x = "Percent of responses", y = NULL) +
     theme_classic() +
     scale_x_continuous(breaks = c(0, 0.5, 1.0), labels = scales::percent) +
     scale_fill_brewer(palette = "OrRd") +
@@ -483,8 +638,20 @@ assessment_fig <- assessment %>%
     # https://stackoverflow.com/q/27130610/186904
     # http://www.cookbook-r.com/Graphs/Legends_(ggplot2)/
     theme(legend.position = "bottom") +
-    guides(fill = guide_legend(title = NULL, nrow = 1, byrow = TRUE))
+    guides(fill = guide_legend(title = NULL, nrow = 1, byrow = TRUE)) +
+    base_plot
 assessment_fig
+
+ggsave(
+    filename = "assessment.png",
+    plot = assessment_fig,
+    path = "plots/",
+    width = 720,
+    height = 640,
+    units = "px",
+    dpi = 72,
+    type = "cairo"
+)
 
 #
 # Publishing platforms----------------------------------------------------------
@@ -534,7 +701,7 @@ platforms$Platforms <- platforms$Platforms %>%
         "Version control platforms",
         "Specialist data repositories",
         "Wikipedia",
-        "Research Ideas & Outcomes (RIO)",
+        "Research Ideas and Outcomes (RIO)",
         "Open Science Framework (OSF)",
         "Registered reports",
         "Zenodo",
@@ -560,11 +727,23 @@ platforms_fig <- platforms %>%
         x = `n_responses`/n_distinct(platforms$Response_ID),
         y = `Platforms`)) +
     geom_col(fill = "#fc8d59") +
-    labs(x = "Proportion of responses", y = NULL) +
+    labs(x = "Percent of responses", y = NULL) +
     theme_classic() +
     scale_x_continuous(labels = scales::percent) +
-    scale_fill_brewer(palette = "OrRd")
+    scale_fill_brewer(palette = "OrRd") +
+    base_plot
 platforms_fig
+
+ggsave(
+    filename = "platforms.png",
+    plot = platforms_fig,
+    path = "plots/",
+    width = 720,
+    height = 480,
+    units = "px",
+    dpi = 72,
+    type = "cairo"
+)
 
 #
 # Research culture by career stage----------------------------------------------
@@ -637,7 +816,8 @@ research_culture_early_fig <- research_culture_early %>%
     scale_fill_brewer(palette = "OrRd") +
     # https://stackoverflow.com/q/27130610/186904
     theme(legend.position = "bottom") +
-    guides(fill = guide_legend(title = NULL, nrow = 1, byrow = TRUE))
+    guides(fill = guide_legend(title = NULL, nrow = 1, byrow = TRUE)) +
+    base_plot
 research_culture_early_fig
 research_culture_late_fig <- research_culture_late %>%
     group_by(`Factor`, `Level`) %>%
@@ -650,7 +830,8 @@ research_culture_late_fig <- research_culture_late %>%
     scale_fill_brewer(palette = "OrRd") +
     # https://stackoverflow.com/q/27130610/186904
     theme(legend.position = "bottom") +
-    guides(fill = guide_legend(title = NULL, nrow = 1, byrow = TRUE))
+    guides(fill = guide_legend(title = NULL, nrow = 1, byrow = TRUE)) +
+    base_plot
 research_culture_late_fig
 
 # Calculate numbers and proportions of the responses
@@ -780,7 +961,8 @@ not_publish_early_fig <- not_publish_early %>%
     labs(x = "Proportion of responses", y = NULL) +
     theme_classic() +
     scale_x_continuous(labels = scales::percent) +
-    scale_fill_brewer(palette = "OrRd")
+    scale_fill_brewer(palette = "OrRd") +
+    base_plot
 not_publish_early_fig
 
 not_publish_late_fig <- not_publish_late %>%
@@ -794,7 +976,8 @@ not_publish_late_fig <- not_publish_late %>%
     labs(x = "Proportion of responses", y = NULL) +
     theme_classic() +
     scale_x_continuous(labels = scales::percent) +
-    scale_fill_brewer(palette = "OrRd")
+    scale_fill_brewer(palette = "OrRd") +
+    base_plot
 not_publish_late_fig
 
 # Calculate numbers and proportions of the responses
@@ -870,7 +1053,8 @@ publish_early_early_fig <- publish_early_early %>%
     labs(x = "Proportion of responses", y = NULL) +
     theme_classic() +
     scale_x_continuous(labels = scales::percent) +
-    scale_fill_brewer(palette = "OrRd")
+    scale_fill_brewer(palette = "OrRd") +
+    base_plot
 publish_early_early_fig
 publish_early_late_fig <- publish_early_late %>%
     group_by(`barriers`) %>%
@@ -883,7 +1067,8 @@ publish_early_late_fig <- publish_early_late %>%
     labs(x = "Proportion of responses", y = NULL) +
     theme_classic() +
     scale_x_continuous(labels = scales::percent) +
-    scale_fill_brewer(palette = "OrRd")
+    scale_fill_brewer(palette = "OrRd") +
+    base_plot
 publish_early_late_fig
 
 # Calculate numbers and proportions of the responses
@@ -921,7 +1106,7 @@ rm(Task_order)
 # http://www.cookbook-r.com/Manipulating_data/Renaming_levels_of_a_factor/
 levels(division_of_labour_by_stage$"Task") <-
     list("Defining question" = "Tasks_definition",
-         "Reviewing state of the art" = "Tasks_review",
+         "Literature review" = "Tasks_review",
          "Defining hypothesis" = "Tasks_hypothesis",
          "Developing methodology" = "Tasks_methodology",
          "Data collection (qualitative)" = "Tasks_data_qualitative",
@@ -987,7 +1172,8 @@ division_of_labour_early_fig <- division_of_labour_early %>%
     # https://stackoverflow.com/q/27130610/186904
     # http://www.cookbook-r.com/Graphs/Legends_(ggplot2)/
     theme(legend.position = "bottom") +
-    guides(fill = guide_legend(title = NULL, nrow = 2, byrow = TRUE))
+    guides(fill = guide_legend(title = NULL, nrow = 2, byrow = TRUE)) +
+    base_plot
 division_of_labour_early_fig
 # Create 100% stacked bar plot
 division_of_labour_late_fig <- division_of_labour_late %>%
@@ -1003,7 +1189,8 @@ division_of_labour_late_fig <- division_of_labour_late %>%
     # https://stackoverflow.com/q/27130610/186904
     # http://www.cookbook-r.com/Graphs/Legends_(ggplot2)/
     theme(legend.position = "bottom") +
-    guides(fill = guide_legend(title = NULL, nrow = 2, byrow = TRUE))
+    guides(fill = guide_legend(title = NULL, nrow = 2, byrow = TRUE)) +
+    base_plot
 division_of_labour_late_fig
 
 # Calculate numbers and proportions of the responses
@@ -1097,7 +1284,8 @@ assessment_early_fig <- assessment_early %>%
     # https://stackoverflow.com/q/27130610/186904
     # http://www.cookbook-r.com/Graphs/Legends_(ggplot2)/
     theme(legend.position = "bottom") +
-    guides(fill = guide_legend(title = NULL, nrow = 1, byrow = TRUE))
+    guides(fill = guide_legend(title = NULL, nrow = 1, byrow = TRUE)) +
+    base_plot
 assessment_early_fig
 assessment_late_fig <- assessment_late %>%
     group_by(`Factor`, `Influence`) %>%
@@ -1112,7 +1300,8 @@ assessment_late_fig <- assessment_late %>%
     # https://stackoverflow.com/q/27130610/186904
     # http://www.cookbook-r.com/Graphs/Legends_(ggplot2)/
     theme(legend.position = "bottom") +
-    guides(fill = guide_legend(title = NULL, nrow = 1, byrow = TRUE))
+    guides(fill = guide_legend(title = NULL, nrow = 1, byrow = TRUE)) +
+    base_plot
 assessment_late_fig
 
 # Calculate numbers and proportions of the responses
@@ -1224,7 +1413,8 @@ platforms_late_fig <- platforms_late %>%
     labs(x = "Proportion of responses", y = NULL) +
     theme_classic() +
     scale_x_continuous(labels = scales::percent) +
-    scale_fill_brewer(palette = "OrRd")
+    scale_fill_brewer(palette = "OrRd") +
+    base_plot
 platforms_late_fig
 
 # Calculate numbers and proportions of the responses
